@@ -1,0 +1,23 @@
+CLAM-masterのextract_features_fp.py及びdataset_h5.pyに変更を加えることで、特徴抽出の際にcycleganによる推論を行うオプションを追加しています。
+(extract_features_fp.py：コマンド引数(--cycle_gan)など追加、プロセス数設定部分変更dataset_h5.py：cyclegan推論実行クラスと実行部分追加)
+機能を使用する際にはCLAM-masterの配下に以下ファイルを配置する必要があります。
+・extract_features_fp.py(今回作成分。同名の元ファイルは別名保存しておくことをお勧めします)
+・cycleganモデル(.pth)
+・generator.py 
+
+また、CLAM-master直下のdatasetsディレクトリに以下ファイルを置きます。
+・dataset_h5.py(今回作成分。同名の元ファイルは別名保存しておくことをお勧めします)
+
+extract_features_fp.py実行の際、引数に--cycle_ganを付けることでcycleganによる変換が行われます。
+WSIから読み込んだPILイメージを、Cycleganを通したPILイメージに変換し、resnet等モデルを通して特徴を抽出します。
+
+また、確認用にcycleganによる変換前後のパッチ画像を10枚出力します。
+パッチの保存枚数や、保存するかどうかの選択は、dataset_h5.pyのcycleGanクラスの__init()__で設定することができます。
+パッチ画像の出力先はCLAM-master配下の以下フォルダ内です。
+・cgan_out_pre (変換前のパッチ画像)
+・cgan_out_post(変換後のパッチ画像)
+
+なお、途中cycleganと特徴抽出の同時実行を避けるためにプロセス数を4=>1に変更していることもあり、処理時間はかなり長くなると思われます。
+当初はCycleganと特徴抽出のテンソルと両方でcudaを使用させていたため、以下のエラーが発生していました。
+RuntimeError: Cannot re-initialize CUDA in forked subprocess. To use CUDA with multiprocessing, you must use the 'spawn' start method
+プログラムの中ではnum_workers=4と指定しており、複数プロセスを同時に用いていることに関係して発生していると思われますが、調べた解決策(fork=>spawn)では改善できなかったため、プロセス数を1つにすることでエラーを回避しています。
