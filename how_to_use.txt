@@ -8,6 +8,9 @@ CLAM-masterのextract_features_fp.py及びdataset_h5.pyに変更を加えるこ�
 また、CLAM-master直下のdatasetsディレクトリに以下ファイルを置きます。
 ・dataset_h5.py(今回作成分。同名の元ファイルは別名保存しておくことをお勧めします)
 
+cycleganモデルのファイル名は、dataset_h5.pyのcycleGanクラスの__init()__内で、self.generator_A2B =に記載することで指定します。
+(デフォルト値="./netG_A2B.pth")
+
 extract_features_fp.py実行の際、引数に--cycle_ganを付けることでcycleganによる変換が行われます。
 WSIから読み込んだPILイメージを、Cycleganを通したPILイメージに変換し、resnet等モデルを通して特徴を抽出します。
 
